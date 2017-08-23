@@ -5,8 +5,10 @@ import (
 	"math/rand"
 )
 
+// channels[n] connects node n and its parent if it exists.
 var channels []chan int
 
+// initialize initializes the channels.
 func initialize(WORKERS int) {
 	channels = make([]chan int, WORKERS)
 	for i := 0; i != WORKERS; i++ {
@@ -14,6 +16,7 @@ func initialize(WORKERS int) {
 	}
 }
 
+// system executes the concurrent system with WORKERS many nodes.
 func system(WORKERS int, seed int64) {
 	rand.Seed(seed)
 	printChannel := make(chan string)
@@ -49,6 +52,7 @@ func node(WORKERS, id, value int, printChannel chan string) {
 	}
 }
 
+// console reads in a value and prints it out to the standard input.
 func console(WORKERS int, in chan string) {
 	for i := 0; i != 2*WORKERS; i++ {
 		fmt.Println(<-in)

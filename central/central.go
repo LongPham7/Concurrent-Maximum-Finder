@@ -5,18 +5,22 @@ import (
 	"math/rand"
 )
 
+// system executes the concurrent system consisting of WORKERS many nodes
+// and a single coordinator.
 func system(WORKERS int, seed int64) {
 	rand.Seed(seed)
 	fromN := make(chan int)
 	toN := make(chan int)
 	printChannel := make(chan string)
 	for i := 0; i != WORKERS; i++ {
-		go node(i, rand.Intn(10 * WORKERS), toN, fromN, printChannel)
+		go node(i, rand.Intn(10*WORKERS), toN, fromN, printChannel)
 	}
 	go coordinator(WORKERS, fromN, toN)
 	console(WORKERS, printChannel)
 }
 
+// coordinator keeps track of the maximum of the values that have been
+// sent by the nodes thus far.
 func coordinator(WORKERS int, in, out chan int) {
 	max := 0
 	for i := 0; i != WORKERS; i++ {
@@ -34,8 +38,9 @@ func node(id, value int, in, out chan int, printChannel chan string) {
 	printChannel <- fmt.Sprintf("Node %d now has %d", id, max)
 }
 
+// console reads in a value and prints it out to the standard input.
 func console(WORKERS int, printChannel chan string) {
-	for i := 0; i != 2 * WORKERS; i++ {
+	for i := 0; i != 2*WORKERS; i++ {
 		fmt.Println(<-printChannel)
 	}
 }
@@ -58,6 +63,6 @@ func main() {
 		fmt.Println("Please specify the number of nodes. It must be positve.")
 		fmt.Scan(&workers)
 	}
-	
+
 	system(workers, seed)
 }
